@@ -43,10 +43,10 @@ trips <- trips %>%
 # Changing Date presentation
 trips <- trips %>%
   mutate(
-    Start.Date = dmy_hms(Start.Date),
-    End.Date   = dmy_hms(End.Date)
+    Start.Date = dmy_hm((Start.Date)), # As was reveived as string it's needed to change in date format
+    End.Date   = dmy_hm((End.Date)) # As was reveived as string it's needed to change in date format
   ) %>%
-  mutate(
+  mutate(    # Separate date columns in two components
     Start_Date = as.Date(Start.Date),
     Start_Time = format(Start.Date, "%H:%M:%S"),
     End_Date   = as.Date(End.Date),
