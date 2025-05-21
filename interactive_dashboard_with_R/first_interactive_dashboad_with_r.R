@@ -20,15 +20,13 @@ ui <- fluidPage(
     ),
     mainPanel(                                                                       # Create a main paned for the dashboard
       tabsetPanel(
-        tabPanel("Interactive chart with ggirapg", girafeOutput("plot_ggiraph")),    # Add a plot created with ggiraph and mark the id
-        tabPanel("Interactive chart with plotly", plotlyOutput("plot_plotly")),      # Add a plot created with plotly and mark the id
-        tabPanel("Interactive Table", DTOutput("table"))                             # Add a table created with DT and mark the id
+        tabPanel("Interactive chart with ggirapg", girafeOutput("plot_ggiraph")),    # Add tab where will be located a plot created with ggiraph and mark the id
+        tabPanel("Interactive chart with plotly", plotlyOutput("plot_plotly")),      # Add tab where will be located a plot created with plotly and mark the id
+        tabPanel("Interactive Table", DTOutput("table"))                             # Add tab where will be located a table created with DT and mark the id
       )
     )
   )
 )
-
-print(ui)
 
 #Creatin server section
 
@@ -37,7 +35,7 @@ server <- function(input, output) {
   # interactive chart with ggiraph
   output$plot_ggiraph <- renderGirafe({
     p <- ggplot(mtcars, aes_string(x = 'wt', y = input$var, color = "factor(cyl)")) +
-      geom_point_interactive(aes(tooltip = paste("Value:", input$var))) +
+      geom_point_interactive(aes(tooltip = paste("Value:", input$var))) +              # Add a personalized tooltip
       labs(title =  "Interactive chart with ggiraph")
     girafe(ggobj =  p)
   })
@@ -55,8 +53,6 @@ server <- function(input, output) {
     datatable(mtcars, options = list(pageLength = 5))
   })
 }
-
-print(server)
 
 # Render the final dashboard
 shinyApp(ui, server)
