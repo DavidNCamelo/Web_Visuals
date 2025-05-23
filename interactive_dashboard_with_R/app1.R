@@ -95,16 +95,14 @@ ui <- fluidPage(
     column(6,
       plotlyOutput(
         outputId = "start_trips_st",
-        width = "100%",
-        height = "50%"
+        width = "100%"
       )
     ),
 
     column(6,
       plotlyOutput(
         outputId = "end_trips_st",
-        width = "100%",
-        height = "50%"
+        width = "100%"
       )
     )
   ),
@@ -113,16 +111,14 @@ ui <- fluidPage(
     column(6,
       plotOutput(
         outputId = "start_trips_ph",
-        width = "100%",
-        height = "50%"
+        width = "100%"
       )
     ),
 
     column(6,
       plotOutput(
         outputId = "end_trips_ph",
-        width = "100%",
-        height = "50%"
+        width = "100%"
       )
     )
  )
@@ -168,8 +164,12 @@ server <- function(input, output, session) {
   })
 
   end_station_filter <- reactive({
-    start_station_filter() %>%
-      filter(End_Station_Name == input$end_station)
+    if(input$end_station == "ALL") {
+      start_station_filter()
+    } else {
+      start_station_filter() %>%
+        filter(End_Station_Name == input$end_station)
+    }    
   })
 
   # Graphic charts
@@ -198,7 +198,7 @@ server <- function(input, output, session) {
   # Ended Trips per station chart
   output$end_trips_st <- renderPlotly ({
     # First counting the started trips by station
-    ended_trips_st <- start_station_filter() %>%
+    ended_trips_st <- end_station_filter() %>%
       count(End_Station_Name, name = "ended_trips")
 
     # Create the chart
@@ -207,13 +207,44 @@ server <- function(input, output, session) {
       x = ~ended_trips,
       y = ~reorder(End_Station_Name, ended_trips),
       type = "bar",
-      orientation = "h"
+      orientation = "h",
+      marker = list(color = "orange")
     ) |>
       layout(
         title = "Ended Trips per Station",
         xaxis = list(title = "Ended Trips"),
         yaxis = list(title = "End Station")
       )
+  })
+
+  # Started trip per hour
+  output$start_trips_ph <- renderPlot ({
+    # Count the started trips per hour
+    start_trips_ph <- end_station_filter() %>%
+      mutate(hour = as.integer(substr(Start_Time, 1, 2))) %>%
+      count(hour, name = "started_trips_per_hour")
+
+    # Create chart
+    ggplot(
+      start_trips_ph,
+      aes(x = hour, y = started_trips_per_hour)) +  
+      geom_col(fill = "blue")+
+      labs(x = "Start Hour", y = "Started Trips", title =  "Started Trips per Hour")
+  })
+
+  # Ended trip per hour
+  output$end_trips_ph <- renderPlot ({
+    # Count the started trips per hour
+    end_trips_ph <- end_station_filter() %>%
+      mutate(hour = as.integer(substr(End_Time, 1, 2))) %>%
+      count(hour, name = "ended_trips_per_hour")
+
+    # Create chart
+    ggplot(
+      end_trips_ph,
+      aes(x = hour, y = ended_trips_per_hour)) +  
+      geom_col(fill = "orange")+
+      labs(x = "End Hour", y = "Ended Trips", title =  "Started Trips per Hour")
   })
 }
 
