@@ -74,7 +74,7 @@ ui <- fluidPage(
       width = 2,
       selectInput(
         "end_city",
-        "End Station",
+        "End City",
         choices = c("All" = "ALL", end_cities),
         multiple = TRUE
       )
@@ -146,29 +146,50 @@ server <- function(input, output, session) {
   })
 
   start_city_filter <- reactive({
-    if(input$start_city == "ALL") {
+    if("ALL" %in% input$start_city) {
       year_filter()
     } else {
       year_filter() %>%
-        filter(Start_Station_City == input$start_city)
+        filter(Start_Station_City %in% input$start_city)
     }    
   })
 
   start_station_filter <- reactive({
-    if(input$start_station == "ALL") {
+    if("ALL" %in% input$start_station) {
       start_city_filter()
     } else {
       start_city_filter() %>%
-        filter(Start_Station_Name == input$start_station)
+        filter(Start_Station_Name %in% input$start_station)
     }    
   })
 
+  # Oberve events for the last 2 filters
+  observeEvent(input$start_city, {
+    # Filtering by start city
+    filtered_data <- if ("ALL" %in% input$start_city) {
+      year_filter()
+    } else {
+      year_filter() %>% filter(Start_Station_City %in% input$start_city)
+    }
+  
+    # Extract values
+    updated_stations <- sort(unique(filtered_data$Start_Station_Name))
+  
+    # #Ubdate the start station slicer
+    updateSelectInput(
+      inputId = "start_station",
+      choices = c("All" = "ALL", updated_stations),
+      selected = "ALL"
+    )
+  })
+  
+
   end_station_filter <- reactive({
-    if(input$end_station == "ALL") {
+    if("ALL" %in% input$end_station) {
       start_station_filter()
     } else {
       start_station_filter() %>%
-        filter(End_Station_Name == input$end_station)
+        filter(End_Station_Name %in% input$end_station)
     }    
   })
 

@@ -1,4 +1,5 @@
 # SHINY Dashboard documentarion Example
+# This is the basic structure abour how to use this library
 
 # Required Library
 library(shiny)
@@ -7,14 +8,10 @@ library(shinydashboard)
 shinyApp(
   ui = dashboardPage(
     dashboardHeader(
-      title = "Dashboard with Shiny",
-      titlewidth = '100%'
+      title = "Dashboard with Shiny"
     ),
-    dashboardSidebar(disable = TRUE),
-    dashboardBody(
-      h2("Content")
-    ),
-    title = "Dashboard example"
+    dashboardSidebar(),
+    dashboardBody(),
   ),
   server = function(input, output) { }
 )
