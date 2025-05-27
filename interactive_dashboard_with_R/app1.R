@@ -34,6 +34,7 @@ ui <- fluidPage(
     style = "text-align:center;"
   ),
 
+  # Add filters row
   fluidRow(
     column(
       width = 1,
@@ -94,22 +95,30 @@ ui <- fluidPage(
     )
   ),
 
+  # Add first charts row
   fluidRow(
     column(6,
-      plotlyOutput(
-        outputId = "start_trips_st",
-        width = "100%"
+      div(
+        style = "height: 400px; overflow-y: auto; border: 1px solid #fff; padding: 5px",
+        plotlyOutput(
+          outputId = "start_trips_st",
+          height = "500%"
+        )
       )
     ),
 
-    column(6,
-      plotlyOutput(
-        outputId = "end_trips_st",
-        width = "100%"
+    column(6, 
+      div(
+        style = "height: 400px; overflow-y: auto; border: 1px solid #fff; padding: 5px",
+        plotlyOutput(
+          outputId = "end_trips_st",
+          height = "500%"
+        )
       )
     )
   ),
 
+  # Add Second chart row
   fluidRow(
     column(6,
       plotOutput(
