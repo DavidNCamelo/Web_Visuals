@@ -245,13 +245,30 @@ server <- function(input, output, session) {
     started_trips_st <- start_station_filter() %>%
       count(Start_Station_Name, name = "started_trips")
 
+    # Add abreviations into the tootlip
+    started_trips_st$label_text <- ifelse(
+      started_trips_st$started_trips >= 1000,
+      paste0(formatC(started_trips_st$started_trips / 1000, format = "f", digits = 1), "K"),
+      as.character(started_trips_st$started_trips)
+    )
+
+    # Double row tooltip
+    started_trips_st$tooltip_text <- paste0(
+      started_trips_st$Start_Station_Name, "<br>",
+      format(started_trips_st$started_trips, big.mark = ",")
+    )
+
     # Create the chart
     plot_ly(
       data = started_trips_st,
       x = ~started_trips,
       y = ~reorder(Start_Station_Name, started_trips),
+      text = ~label_text,
+      textposition = "outside",
       type = "bar",
-      orientation = "h"
+      orientation = "h",
+      hoverinfo = "text",
+      hovertext = ~tooltip_text
     ) |>
       layout(
         title = "Started Trips per Station",
@@ -266,13 +283,29 @@ server <- function(input, output, session) {
     ended_trips_st <- end_station_filter() %>%
       count(End_Station_Name, name = "ended_trips")
 
+    # Add abreviations into the tootlip
+    ended_trips_st$label_text <- ifelse(
+      ended_trips_st$ended_trips >= 1000,
+      paste0(formatC(ended_trips_st$ended_trips / 1000, format = "f", digits = 1), "K"),
+      as.character(ended_trips_st$ended_trips)
+    )
+
+    # Double row tooltip
+    ended_trips_st$tooltip_text <- paste0(
+      ended_trips_st$End_Station_Name, "<br>",
+      format(ended_trips_st$ended_trips, big.mark = ",")
+    )
     # Create the chart
     plot_ly(
       data = ended_trips_st,
       x = ~ended_trips,
       y = ~reorder(End_Station_Name, ended_trips),
+      text = ~label_text,
       type = "bar",
+      textposition = "outside",
       orientation = "h",
+      hoverinfo = "text",
+      hovertext = ~tooltip_text,
       marker = list(color = "orange")
     ) |>
       layout(
