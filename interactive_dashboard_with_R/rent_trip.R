@@ -3,10 +3,15 @@ library(dplyr)
 library(lubridate)
 
 # Read trips data
-trips <- read.csv("../../Sumz 2023/BikesShare_Analysis/trip_data.csv")
+#trips <- read.csv("../../Sumz 2023/BikesShare_Analysis/trip_data.csv")
+
 
 # Read stations data
-stations <- read.csv("../../Sumz 2023/BikesShare_Analysis/station_data.csv")
+#stations <- read.csv("../../Sumz 2023/BikesShare_Analysis/station_data.csv")
+
+# Read data when run app from the terminal
+trips <- read.csv("../../../Sumz 2023/BikesShare_Analysis/trip_data.csv")
+stations <- read.csv("../../../Sumz 2023/BikesShare_Analysis/station_data.csv")
 
 # Required station changes
 new_station_codes <- c(`85` = 23, `86` = 25, `87` = 49, `88` = 69, `89` = 72, `90` = 72)

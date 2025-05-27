@@ -7,7 +7,9 @@ library(ggplot2)
 library(lubridate)
 
 # Data
-source('./interactive_dashboard_with_R/rent_trip.R')
+#source('./interactive_dashboard_with_R/rent_trip.R')
+# When run from the terminal
+source('./rent_trip.R')
 
 # Listing started points
 start_stations <- unique(trips$Start_Station_Name)
@@ -76,7 +78,8 @@ ui <- fluidPage(
         "end_city",
         "End City",
         choices = c("All" = "ALL", end_cities),
-        multiple = TRUE
+        multiple = TRUE,
+        selected = "ALL"
       )
     ),
     column(
@@ -127,7 +130,7 @@ ui <- fluidPage(
 # Create the server
 server <- function(input, output, session) {
 
-  # Crear el reactive de input$years
+  # Create the reactive of input$years
   year_filter <- reactive({
     if(input$year != "ALL") {
       trips %>%
@@ -137,6 +140,7 @@ server <- function(input, output, session) {
     }
   })
 
+  # Reactive for Year and Date Range
   date_range_filter <- reactive({
     year_filter() %>%
       filter(
@@ -145,6 +149,7 @@ server <- function(input, output, session) {
       )
   })
 
+  # Reactive for previous filters and the new Start City
   start_city_filter <- reactive({
     if("ALL" %in% input$start_city) {
       year_filter()
@@ -154,6 +159,7 @@ server <- function(input, output, session) {
     }    
   })
 
+  # Reactive for previous filters and the new Start Station
   start_station_filter <- reactive({
     if("ALL" %in% input$start_station) {
       start_city_filter()
@@ -183,14 +189,43 @@ server <- function(input, output, session) {
     )
   })
   
-
-  end_station_filter <- reactive({
-    if("ALL" %in% input$end_station) {
+  # Reactive for previous filters and the new End City
+  end_city_filter <- reactive({
+    if("ALL" %in% input$end_city) {
       start_station_filter()
     } else {
       start_station_filter() %>%
+        filter(End_Station_City %in% input$end_city)
+    }
+  })
+
+  end_station_filter <- reactive({
+    if("ALL" %in% input$end_station) {
+      end_city_filter()
+    } else {
+      end_city_filter() %>%
         filter(End_Station_Name %in% input$end_station)
     }    
+  })
+
+  # Oberve events for the last 2 filters
+  observeEvent(input$end_city, {
+    # Filtering by start city
+    end_ct_filtered_data <- if ("ALL" %in% input$end_city) {
+      start_city_filter()
+    } else {
+      start_city_filter() %>% filter(End_Station_City %in% input$end_city)
+    }
+  
+    # Extract values
+    end_updated_stations <- sort(unique(end_ct_filtered_data$End_Station_Name))
+  
+    # #Ubdate the end station slicer
+    updateSelectInput(
+      inputId = "end_station",
+      choices = c("All" = "ALL", end_updated_stations),
+      selected = "ALL"
+    )
   })
 
   # Graphic charts
