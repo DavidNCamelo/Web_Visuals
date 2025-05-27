@@ -158,12 +158,37 @@ server <- function(input, output, session) {
       )
   })
 
+  #Add observe event over the date filters
+  observeEvent(input$year, {
+    # Filtering dates just for the selected year
+    if (input$year != "ALL") {
+      filtered_dates <- trips %>%
+        filter(year(Start_Date) == as.numeric(input$year))
+      
+      new_min <- min(filtered_dates$Start_Date, na.rm = TRUE)
+      new_max <- max(filtered_dates$Start_Date, na.rm = TRUE)
+    } else {
+      new_min <- min(trips$Start_Date, na.rm = TRUE)
+      new_max <- max(trips$Start_Date, na.rm = TRUE)
+    }
+  
+    # Update date range slicer
+    updateDateRangeInput(
+      session,
+      inputId = "date_range",
+      start = new_min,
+      end = new_max,
+      min = new_min,
+      max = new_max
+    )
+  })
+
   # Reactive for previous filters and the new Start City
   start_city_filter <- reactive({
     if("ALL" %in% input$start_city) {
-      year_filter()
+      date_range_filter()
     } else {
-      year_filter() %>%
+      date_range_filter() %>%
         filter(Start_Station_City %in% input$start_city)
     }    
   })
@@ -182,9 +207,9 @@ server <- function(input, output, session) {
   observeEvent(input$start_city, {
     # Filtering by start city
     filtered_data <- if ("ALL" %in% input$start_city) {
-      year_filter()
+      date_range_filter()
     } else {
-      year_filter() %>% filter(Start_Station_City %in% input$start_city)
+      date_range_filter() %>% filter(Start_Station_City %in% input$start_city)
     }
   
     # Extract values
