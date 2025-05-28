@@ -121,14 +121,14 @@ ui <- fluidPage(
   # Add Second chart row
   fluidRow(
     column(6,
-      plotOutput(
+      plotlyOutput(
         outputId = "start_trips_ph",
         width = "100%"
       )
     ),
 
     column(6,
-      plotOutput(
+      plotlyOutput(
         outputId = "end_trips_ph",
         width = "100%"
       )
@@ -341,33 +341,37 @@ server <- function(input, output, session) {
   })
 
   # Started trip per hour
-  output$start_trips_ph <- renderPlot ({
+  output$start_trips_ph <- renderPlotly ({
     # Count the started trips per hour
     start_trips_ph <- end_station_filter() %>%
       mutate(hour = as.integer(substr(Start_Time, 1, 2))) %>%
       count(hour, name = "started_trips_per_hour")
 
     # Create chart
-    ggplot(
+    started_per_hour <- ggplot(
       start_trips_ph,
       aes(x = hour, y = started_trips_per_hour)) +  
       geom_col(fill = "blue")+
       labs(x = "Start Hour", y = "Started Trips", title =  "Started Trips per Hour")
+
+    ggplotly(started_per_hour) # Add plotlyframe to show tooltip
   })
 
   # Ended trip per hour
-  output$end_trips_ph <- renderPlot ({
+  output$end_trips_ph <- renderPlotly ({
     # Count the started trips per hour
     end_trips_ph <- end_station_filter() %>%
       mutate(hour = as.integer(substr(End_Time, 1, 2))) %>%
       count(hour, name = "ended_trips_per_hour")
 
     # Create chart
-    ggplot(
+    ended_per_hour <- ggplot(
       end_trips_ph,
       aes(x = hour, y = ended_trips_per_hour)) +  
       geom_col(fill = "orange")+
       labs(x = "End Hour", y = "Ended Trips", title =  "Started Trips per Hour")
+
+    ggplotly(ended_per_hour) # Add plotlyframe to show tooltip
   })
 }
 
