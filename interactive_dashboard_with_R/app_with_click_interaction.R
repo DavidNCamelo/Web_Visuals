@@ -143,13 +143,14 @@ server <- function(input, output, session) {
   selected_start_station <- reactiveVal(NULL)
 
   # Capture the click
-  observeEvent(event_data('plotly_click', source = 'start_station_plot'), {
-    click_data <- event_data('plotly_click', source = 'start_station_plot')
-    if(!is.null(click_data)) {
-      selected_station <- click_data$y
-      selected_start_station(selected_station)
-    }
-  })
+  observe({
+  click_data <- event_data('plotly_click', source = 'start_station_plot')
+  if (!is.null(click_data) && !is.null(click_data$y)) {
+    selected_start_station(click_data$y)
+  } else {
+    selected_start_station(NULL)
+  }
+})
 
   # Create the reactive of input$years
   year_filter <- reactive({
@@ -276,11 +277,13 @@ server <- function(input, output, session) {
 
   # Reactive filter based on click interaction
   click_start_filtered <- reactive({
-    data <- end_station_filter()
-    if(!is.null(selected_start_station())) {
-      data <- data %>% filter(Start_Station_Name == selected_start_station())
+    filtered_data <- end_station_filter()
+    
+    if (!is.null(selected_start_station())) {
+      filtered_data <- filtered_data %>% filter(Start_Station_Name == selected_start_station())
     }
-    data
+
+    filtered_data
   })
   # Graphic charts
 
@@ -303,6 +306,15 @@ server <- function(input, output, session) {
       format(started_trips_st$started_trips, big.mark = ",")
     )
 
+    selected_station <- selected_start_station()
+
+    # Dinamic colors when click interaction
+    started_trips_st$color <- if (!is.null(selected_station)) {
+      ifelse(started_trips_st$Start_Station_Name == selected_station, "#1f77b4", "rgba(200,200,200,0.5)")
+    } else {
+      rep("#1f77b4", nrow(started_trips_st))
+    }
+
     # Create the chart
     plot_ly(
       data = started_trips_st,
@@ -314,6 +326,7 @@ server <- function(input, output, session) {
       orientation = "h",
       hoverinfo = "text",
       hovertext = ~tooltip_text,
+      marker = list(color = ~color),
       source = 'start_station_plot'
     ) |>
       layout(
