@@ -7,9 +7,9 @@ library(ggplot2)
 library(lubridate)
 
 # Data
-#source('./interactive_dashboard_with_R/rent_trip.R')
+source('./interactive_dashboard_with_R/rent_trip.R')
 # When run from the terminal
-source('./rent_trip.R')
+#source('./rent_trip.R')
 
 # Listing started points
 start_stations <- unique(trips$Start_Station_Name)
