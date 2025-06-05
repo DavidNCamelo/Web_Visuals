@@ -140,22 +140,30 @@ ui <- fluidPage(
 server <- function(input, output, session) {
 
   # Add click interaction elements
-  selected_start_station <- reactiveVal(NULL)
+  selected_station_name <- reactiveVal(NULL)
+  selected_station_type <- reactiveVal(NULL)  # "start" or "end"
 
-  # Capture the click
+  # Capture the click and stablish where are located
   observe({
-  click_data <- event_data('plotly_click', source = 'start_station_plot')
-  if (!is.null(click_data) && !is.null(click_data$y)) {
-    selected_start_station(click_data$y)
-  } else {
-    selected_start_station(NULL)
-  }
-})
+    click_data_start <- event_data("plotly_click", source = "start")
+    click_data_end <- event_data("plotly_click", source = "end")
+
+    if (!is.null(click_data_start) && !is.null(click_data_start$y)) {
+      selected_station_type("start")
+      selected_station_name(click_data_start$y)
+    } else if (!is.null(click_data_end) && !is.null(click_data_end$y)) {
+      selected_station_type("end")
+      selected_station_name(click_data_end$y)
+    } else {
+      selected_station_type(NULL)
+      selected_station_name(NULL)
+    }
+  })
 
   # Create the reactive of input$years
   year_filter <- reactive({
     if(input$year != "ALL") {
-      trips %>%
+      trips |>
         filter(year(Start_Date) == as.numeric(input$year))
     } else {
       trips
@@ -164,7 +172,7 @@ server <- function(input, output, session) {
 
   # Reactive for Year and Date Range
   date_range_filter <- reactive({
-    year_filter() %>%
+    year_filter() |>
       filter(
         Start_Date >= input$date_range[1],
         Start_Date <= input$date_range[2]
@@ -175,7 +183,7 @@ server <- function(input, output, session) {
   observeEvent(input$year, {
     # Filtering dates just for the selected year
     if (input$year != "ALL") {
-      filtered_dates <- trips %>%
+      filtered_dates <- trips |>
         filter(year(Start_Date) == as.numeric(input$year))
       
       new_min <- min(filtered_dates$Start_Date, na.rm = TRUE)
@@ -201,7 +209,7 @@ server <- function(input, output, session) {
     if("ALL" %in% input$start_city) {
       date_range_filter()
     } else {
-      date_range_filter() %>%
+      date_range_filter() |>
         filter(Start_Station_City %in% input$start_city)
     }    
   })
@@ -211,7 +219,7 @@ server <- function(input, output, session) {
     if("ALL" %in% input$start_station) {
       start_city_filter()
     } else {
-      start_city_filter() %>%
+      start_city_filter() |>
         filter(Start_Station_Name %in% input$start_station)
     }    
   })
@@ -222,7 +230,7 @@ server <- function(input, output, session) {
     filtered_data <- if ("ALL" %in% input$start_city) {
       date_range_filter()
     } else {
-      date_range_filter() %>% filter(Start_Station_City %in% input$start_city)
+      date_range_filter() |> filter(Start_Station_City %in% input$start_city)
     }
   
     # Extract values
@@ -241,7 +249,7 @@ server <- function(input, output, session) {
     if("ALL" %in% input$end_city) {
       start_station_filter()
     } else {
-      start_station_filter() %>%
+      start_station_filter() |>
         filter(End_Station_City %in% input$end_city)
     }
   })
@@ -250,7 +258,7 @@ server <- function(input, output, session) {
     if("ALL" %in% input$end_station) {
       end_city_filter()
     } else {
-      end_city_filter() %>%
+      end_city_filter() |>
         filter(End_Station_Name %in% input$end_station)
     }    
   })
@@ -261,7 +269,7 @@ server <- function(input, output, session) {
     end_ct_filtered_data <- if ("ALL" %in% input$end_city) {
       start_city_filter()
     } else {
-      start_city_filter() %>% filter(End_Station_City %in% input$end_city)
+      start_city_filter() |> filter(End_Station_City %in% input$end_city)
     }
   
     # Extract values
@@ -276,21 +284,25 @@ server <- function(input, output, session) {
   })
 
   # Reactive filter based on click interaction
-  click_start_filtered <- reactive({
-    filtered_data <- end_station_filter()
-    
-    if (!is.null(selected_start_station())) {
-      filtered_data <- filtered_data %>% filter(Start_Station_Name == selected_start_station())
+click_filtered <- reactive({
+  data <- end_station_filter()
+    if (!is.null(selected_station_name()) && !is.null(selected_station_type())) {
+      if (selected_station_type() == "start") {
+        data <- data |> filter(Start_Station_Name == selected_station_name())
+      } else if (selected_station_type() == "end") {
+        data <- data |> filter(End_Station_Name == selected_station_name())
+      }
     }
 
-    filtered_data
+    data
   })
+
   # Graphic charts
 
   # Start Trips per station chart
   output$start_trips_st <- renderPlotly ({
     # First counting the started trips by station
-    started_trips_st <- start_station_filter() %>%
+    started_trips_st <- click_filtered() |>
       count(Start_Station_Name, name = "started_trips")
 
     # Add abreviations into the tootlip
@@ -306,14 +318,14 @@ server <- function(input, output, session) {
       format(started_trips_st$started_trips, big.mark = ",")
     )
 
-    selected_station <- selected_start_station()
+    #selected_station <- selected_start_station()
 
     # Dinamic colors when click interaction
-    started_trips_st$color <- if (!is.null(selected_station)) {
-      ifelse(started_trips_st$Start_Station_Name == selected_station, "#1f77b4", "rgba(200,200,200,0.5)")
-    } else {
-      rep("#1f77b4", nrow(started_trips_st))
-    }
+    #started_trips_st$color <- if (!is.null(selected_station)) {
+    #  ifelse(started_trips_st$Start_Station_Name == selected_station, "#1f77b4", "rgba(200,200,200,0.5)")
+    #} else {
+    #  rep("#1f77b4", nrow(started_trips_st))
+    #}
 
     # Create the chart
     plot_ly(
@@ -326,20 +338,21 @@ server <- function(input, output, session) {
       orientation = "h",
       hoverinfo = "text",
       hovertext = ~tooltip_text,
-      marker = list(color = ~color),
-      source = 'start_station_plot'
+      #marker = list(color = ~color),
+      source = 'start'
     ) |>
       layout(
         title = "Started Trips per Station",
         xaxis = list(title = "Started Trips"),
         yaxis = list(title = "Start Station")
-      )
+      ) |>
+        event_register("plotly_click")       # Restart filter when double click outer the bars 
   })
 
   # Ended Trips per station chart
   output$end_trips_st <- renderPlotly ({
     # First counting the started trips by station
-    ended_trips_st <- click_start_filtered() %>%
+    ended_trips_st <- click_filtered() |>
       count(End_Station_Name, name = "ended_trips")
 
     # Add abreviations into the tootlip
@@ -365,20 +378,22 @@ server <- function(input, output, session) {
       orientation = "h",
       hoverinfo = "text",
       hovertext = ~tooltip_text,
-      marker = list(color = "orange")
+      marker = list(color = "orange"),
+      source = 'end'
     ) |>
       layout(
         title = "Ended Trips per Station",
         xaxis = list(title = "Ended Trips"),
         yaxis = list(title = "End Station")
-      )
+      ) |>
+      event_register("plotly_click")       # Restart filter when double click outer the bars
   })
 
   # Started trip per hour
   output$start_trips_ph <- renderPlotly ({
     # Count the started trips per hour
-    start_trips_ph <- click_start_filtered() %>%
-      mutate(hour = as.integer(substr(Start_Time, 1, 2))) %>%
+    start_trips_ph <- click_filtered() |>
+      mutate(hour = as.integer(substr(Start_Time, 1, 2))) |>
       count(hour, name = "started_trips_per_hour")
 
     # Create chart
@@ -394,8 +409,8 @@ server <- function(input, output, session) {
   # Ended trip per hour
   output$end_trips_ph <- renderPlotly ({
     # Count the started trips per hour
-    end_trips_ph <- click_start_filtered() %>%
-      mutate(hour = as.integer(substr(End_Time, 1, 2))) %>%
+    end_trips_ph <- click_filtered() |>
+      mutate(hour = as.integer(substr(End_Time, 1, 2))) |>
       count(hour, name = "ended_trips_per_hour")
 
     # Create chart
