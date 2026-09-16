@@ -1,0 +1,23 @@
+# R and RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+.httr-oauth
+
+# rv (R version manager) - keep rv.lock but ignore libraries
+rv/library/
+rv/cache/
+
+# R package development
+*.tar.gz
+*.zip
+src/*.o
+src/*.so
+src/*.dll
+
+# Shiny
+rsconnect/
+shinyapps/
+*.dcf

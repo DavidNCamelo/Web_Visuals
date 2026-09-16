@@ -1,7 +1,18 @@
 # New app example
 
-library(shiny)
-library(plotly)
+box::use(
+  shiny[...],
+  dplyr[...],
+  plotly[...]
+)
+
+# Generate data
+data <- data.frame(
+  name = c("Giss", "Dav", "Mat", "Kt", "Kr1", "kr2", "X1", "Sof", "Mt"),
+  age = c(25, 26, 27, 27, 28, 26, 10, 16, 27),
+  country = c("Bra", "Col", "Col", "Usa", "Col", "Fra", "Col", "Col", "Col")
+)
+
 
 # Creating ui
 ui <- fluidPage(
@@ -30,20 +41,12 @@ ui <- fluidPage(
   )
 )
 
-# Generate data
-data <- data.frame(
-  name = c("Giss", "Dav", "Mat", "Kt", "Kr1", "kr2", "X1", "Sof", "Mt"),
-  age = c(25, 26, 27, 27, 28, 26, 10, 16, 27),
-  country = c("Bra", "Col", "Col", "Usa", "Col", "Fra", "Col", "Col", "Col")
-)
-
 # Create server
 server <- function(input, output, session) {
-  
   # Reactive filter to input$age
   age_filter <- reactive({
     data |>
-      dplyr::filter(age >= input$age)
+      filter(age >= input$age)
   })
 
   # Reactive filter to input$region and age_filter
@@ -52,14 +55,14 @@ server <- function(input, output, session) {
     if (input$country == "ALL") {
       df
     } else {
-      df |> dplyr::filter(country == input$country)
+      df |> filter(country == input$country)
     }
   })
 
   # Output table
   output$table <- renderTable({
     region_filter() |>
-      dplyr::summarise(
+      summarise(
         mean = mean(age),
         max = max(age),
         min = min(age)
