@@ -1,0 +1,20 @@
+[project]
+name = "interactive-dashboard-with-python"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "David Camelo", email = "NICOLAS.CAMELO28@outlook.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "dash>=4.4.1",
+    "pandas>=3.0.5",
+]
+
+[project.scripts]
+interactive-dashboard-with-python = "interactive_dashboard_with_python:main"
+
+[build-system]
+requires = ["uv_build>=0.12.14,<0.13.0"]
+build-backend = "uv_build"

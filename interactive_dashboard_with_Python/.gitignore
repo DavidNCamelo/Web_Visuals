@@ -1,0 +1,15 @@
+# Entorno virtual creado por uv
+.venv/
+
+# Caché de uv (normalmente vive fuera del repo, pero por si acaso)
+.uv_cache/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribución / empaquetado
+build/
+dist/
+*.egg-info/

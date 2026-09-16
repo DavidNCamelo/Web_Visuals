@@ -14,6 +14,25 @@ The next images are just for the Python folder
 
 ![Final Dash Course](image.png)
 
+## Implementation
+
+This project is managed uv, so you can run each script by:
+
+```bash
+cd .\interactive_dashboard_with_Python\
+```
+
+If is the first time in this repository
+
+```bash
+uv sync
+```
+
+And then 
+
+```bash
+uv run script.py
+```
 
 # Now with R
 
