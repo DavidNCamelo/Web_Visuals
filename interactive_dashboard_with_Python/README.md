@@ -1,0 +1,1 @@
+uv requires a `Readme.md` file to add packages correcttly in a project
