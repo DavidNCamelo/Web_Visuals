@@ -37,6 +37,29 @@ uv run script.py
 # Now with R
 
 And the course to learn this kind of visualization for R is:
-https://www.udemy.com/course/el-arte-de-programar-en-r-anade-valor-a-tu-cv/?couponCode=ST20MT190425G1 
+https://www.udemy.com/course/el-arte-de-programar-en-r-anade-valor-a-tu-cv 
 
 ![alt text](image-3.png)
+
+Keep in mind, the main pillar of working with R is shiny, a great package/framework to create apps in R. These recently could be dockerising with different metodologies and be deployed as any other language.
+
+
+## Implementation
+
+This project is managed uv, so you can run each script by:
+
+```bash
+cd .\interactive_dashboard_with_R\
+```
+
+If is the first time in this repository
+
+```bash
+rv sync
+```
+
+And then 
+
+```bash
+Rscript script.R
+```
