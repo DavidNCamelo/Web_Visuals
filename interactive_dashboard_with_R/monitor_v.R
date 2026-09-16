@@ -1,12 +1,13 @@
 # Monitor v1
 # Required libraries
-library(shiny)
-library(bslib)
-library(plotly)
+box::use(
+  shiny[...],
+  bslib[...],
+  plotly[...]
+)
 
 # Creating UI
-ui <- page_fluid(  
-  
+ui <- page_fluid(
   # Theme
   theme = bs_theme(
     bg = "#e7d1c4",
@@ -15,7 +16,7 @@ ui <- page_fluid(
 
   #Header
   tags$div(
-  style = "
+    style = "
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -25,27 +26,27 @@ ui <- page_fluid(
     position: relative;
     overflow: hidden;
   ",
-  # Logo
-  tags$div(
-    tags$img(
-      src = "logo",
-      style = "height: 45px;"
+    # Logo
+    tags$div(
+      tags$img(
+        src = "logo",
+        style = "height: 45px;"
+      ),
+      style = "flex: 0 0 auto;"
     ),
-    style = "flex: 0 0 auto;"
-  ),
-  # Title
-  tags$div(
-    tags$h1(
-      "Dashboard",
-      style = "
+    # Title
+    tags$div(
+      tags$h1(
+        "Dashboard",
+        style = "
         font-weight: bold;
         font-size: 36px;
         margin: 0;
         line-height: 45px;
         text-align: center;
       "
-    ),
-    style = "
+      ),
+      style = "
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -59,7 +60,8 @@ ui <- page_fluid(
 
   # Styling filters
   tags$head(
-    tags$style(HTML("
+    tags$style(HTML(
+      "
       .custom-container {
         background-color: #f8efda;
         border-radius: 5px;
@@ -85,7 +87,8 @@ ui <- page_fluid(
         border: 1px solid #859da7 !important;
         color: #000 !important;
       }
-    "))
+    "
+    ))
   ),
 
   # Filters
@@ -93,7 +96,8 @@ ui <- page_fluid(
     div(
       style = "flex: 1; background: #f8efda; padding-left: 10px; border-radius: 5px;
       display: flex; flex-direction: column; justify-content: flex-start;",
-      div(class = "custom-container",
+      div(
+        class = "custom-container",
         selectInput(
           "seg_year",
           label = tags$strong("Year Filter"),
@@ -106,8 +110,9 @@ ui <- page_fluid(
     div(
       style = "flex: 1; background: #f8efda; padding-left: 10px; border-radius: 5px;
       display: flex; flex-direction: column; justify-content: flex-start;",
-      div(class = "custom-container",
-          selectInput(
+      div(
+        class = "custom-container",
+        selectInput(
           "seg_c",
           label = tags$strong("Second Slicer"),
           choices = c("Todos" = "ALL", c("cat1", "cat2", "cat3"))
@@ -118,15 +123,29 @@ ui <- page_fluid(
     div(
       style = "flex: 1; background: #f8efda; padding-left: 10px; border-radius: 5px;
       display: flex; flex-direction: column; justify-content: flex-start;",
-      div(class = "custom-container",
-          selectInput(
+      div(
+        class = "custom-container",
+        selectInput(
           "seg_s",
           label = tags$strong("Third Slicer"),
-          choices = c("Todos" = "ALL", c("subcat1", "subcat2", "subcat3", "subcat4", "subcat5", "subcat6", "subcat7", "subcat8", "subcat9"))
+          choices = c(
+            "Todos" = "ALL",
+            c(
+              "subcat1",
+              "subcat2",
+              "subcat3",
+              "subcat4",
+              "subcat5",
+              "subcat6",
+              "subcat7",
+              "subcat8",
+              "subcat9"
+            )
+          )
         )
       )
     ),
-    
+
     col_widths = c(4, 4, 4),
     style = "margin-top: 5px; margin-bottom: 5px;"
   ),
@@ -135,44 +154,57 @@ ui <- page_fluid(
   fluidRow(
     div(
       style = "display: flex; gap: 10px; margin-bottom: 20px;",
-      
+
       div(
         style = "flex: 1; background: #f8efda; padding: 10px; border-radius: 5px;
                  display: flex; flex-direction: column;
                  align-items: center; justify-content: center;",
-        tags$h4("KPI1", style = "font-size: 14px; font-weight: bold; margin: 0;"),
+        tags$h4(
+          "KPI1",
+          style = "font-size: 14px; font-weight: bold; margin: 0;"
+        ),
         div(style = "text-align: center; width: 100%;", textOutput("kpi1"))
       ),
-      
+
       div(
         style = "flex: 1; background: #f8efda; padding: 10px; border-radius: 5px;
                  display: flex; flex-direction: column;
                  align-items: center; justify-content: center;",
-        tags$h4("KPI2", style = "font-size: 14px; font-weight: bold; margin: 0;"),
+        tags$h4(
+          "KPI2",
+          style = "font-size: 14px; font-weight: bold; margin: 0;"
+        ),
         div(style = "text-align: center; width: 100%;", textOutput("kpi2"))
       ),
-      
+
       div(
         style = "flex: 1; background: #f8efda; padding: 10px; border-radius: 5px;
                  display: flex; flex-direction: column;
                  align-items: center; justify-content: center;",
-        tags$h4("KPI3", style = "font-size: 14px; font-weight: bold; margin: 0;"),
+        tags$h4(
+          "KPI3",
+          style = "font-size: 14px; font-weight: bold; margin: 0;"
+        ),
         div(style = "text-align: center; width: 100%;", textOutput("kpi3"))
       ),
-      
+
       div(
         style = "flex: 1; background: #f8efda; padding: 10px; border-radius: 5px;
                  display: flex; flex-direction: column;
                  align-items: center; justify-content: center;",
-        tags$h4("KPI4", style = "font-size: 14px; font-weight: bold; margin: 0;"),
+        tags$h4(
+          "KPI4",
+          style = "font-size: 14px; font-weight: bold; margin: 0;"
+        ),
         div(style = "text-align: center; width: 100%;", textOutput("kpi4"))
       )
     ),
     style = "margin-top: 5px; margin-bottom: 5px;"
   ),
-  
+
   # Graph container
-  tags$style(HTML("
+  tags$style(HTML(
+    "
     .custom-graph-container {
       background-color: #f8efda;
       border-radius: 5px;
@@ -181,10 +213,12 @@ ui <- page_fluid(
       margin-right: 5px;
       margin-left: 5px;
     }
-  ")),
+  "
+  )),
 
   # Tab panel
-  tags$style(HTML("
+  tags$style(HTML(
+    "
     /* Drop background and edges */
     .nav-tabs {
       border-bottom: none !important;
@@ -207,7 +241,8 @@ ui <- page_fluid(
       background-color: transparent !important;
       box-shadow: none !important;
     }
-  ")),
+  "
+  )),
 
   # First graph row
   layout_columns(
@@ -215,25 +250,29 @@ ui <- page_fluid(
     div(
       class = 'custom-graph-container',
       style = "padding: 10px; height: 40vh;",
-      div("Graph 1", 
-          style = "font-weight: bold; font-size: 16px; margin-bottom: 10px;"),
-      plotlyOutput("gr1", height = "calc(100% - 30px)")  # adaptative height
+      div(
+        "Graph 1",
+        style = "font-weight: bold; font-size: 16px; margin-bottom: 10px;"
+      ),
+      plotlyOutput("gr1", height = "calc(100% - 30px)") # adaptative height
     ),
-    
+
     # Tab graph panel
     div(
       class = 'custom-graph-container',
       style = "padding: 5px; height: 40vh;",
       tabsetPanel(
-        nav_panel("Graph tab 1", 
+        nav_panel(
+          "Graph tab 1",
           div(
-            style = "height: 32vh; overflow-y: auto;",                # Include vertical scroll if needed (for h-bar charts)
-            plotlyOutput("tab1") 
+            style = "height: 32vh; overflow-y: auto;", # Include vertical scroll if needed (for h-bar charts)
+            plotlyOutput("tab1")
           )
         ),
-        nav_panel("Graph tab 2", 
+        nav_panel(
+          "Graph tab 2",
           div(
-            style = "height: 32vh; overflow-y: auto;",                # Include vertical scroll if needed (for h-bar charts)
+            style = "height: 32vh; overflow-y: auto;", # Include vertical scroll if needed (for h-bar charts)
             plotlyOutput("tab2")
           )
         )
@@ -242,7 +281,7 @@ ui <- page_fluid(
     col_widths = c(7, 5),
     style = "margin-top: 5px; margin-bottom: 5px; gap: 5px;"
   ),
-  
+
   # Detailed tables
   div(
     class = 'custom-graph-container',
@@ -251,7 +290,7 @@ ui <- page_fluid(
         full_screen = TRUE,
         card_header("Table"),
         div(
-          style = "max-height: 25vh; overflow-y: auto;",  
+          style = "max-height: 25vh; overflow-y: auto;",
           tableOutput("tabla")
         )
       ),

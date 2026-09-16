@@ -9,20 +9,28 @@ library(DT)
 
 # Shiny apps are composed by main components, like de UI and the server
 
-# Creating UI 
+# Creating UI
 ui <- fluidPage(
-  titlePanel("Interactive Dashboard"),                                                # Title for the page
-  sidebarLayout(                                                                     # Create a layout for a side page panel
-    sidebarPanel( 
-      selectInput("var", "Selecting Variable:",                                      # Create a slicer
-                  choices = c("mpg", "hp", "wt"),                                    # Include options
-                  selected = "mpg")                                                  # Default value 
+  titlePanel("Interactive Dashboard"), # Title for the page
+  sidebarLayout(
+    # Create a layout for a side page panel
+    sidebarPanel(
+      selectInput(
+        "var",
+        "Selecting Variable:", # Create a slicer
+        choices = c("mpg", "hp", "wt"), # Include options
+        selected = "mpg"
+      ) # Default value
     ),
-    mainPanel(                                                                       # Create a main paned for the dashboard
+    mainPanel(
+      # Create a main paned for the dashboard
       tabsetPanel(
-        tabPanel("Interactive chart with ggirapg", girafeOutput("plot_ggiraph")),    # Add tab where will be located a plot created with ggiraph and mark the id
-        tabPanel("Interactive chart with plotly", plotlyOutput("plot_plotly")),      # Add tab where will be located a plot created with plotly and mark the id
-        tabPanel("Interactive Table", DTOutput("table"))                             # Add tab where will be located a table created with DT and mark the id
+        tabPanel(
+          "Interactive chart with ggirapg",
+          girafeOutput("plot_ggiraph")
+        ), # Add tab where will be located a plot created with ggiraph and mark the id
+        tabPanel("Interactive chart with plotly", plotlyOutput("plot_plotly")), # Add tab where will be located a plot created with plotly and mark the id
+        tabPanel("Interactive Table", DTOutput("table")) # Add tab where will be located a table created with DT and mark the id
       )
     )
   )
@@ -31,18 +39,23 @@ ui <- fluidPage(
 #Creatin server section
 
 server <- function(input, output) {
-
   # interactive chart with ggiraph
   output$plot_ggiraph <- renderGirafe({
-    p <- ggplot(mtcars, aes_string(x = 'wt', y = input$var, color = "factor(cyl)")) +
-      geom_point_interactive(aes(tooltip = paste("Value:", input$var))) +              # Add a personalized tooltip
-      labs(title =  "Interactive chart with ggiraph")
-    girafe(ggobj =  p)
+    p <- ggplot(
+      mtcars,
+      aes_string(x = 'wt', y = input$var, color = "factor(cyl)")
+    ) +
+      geom_point_interactive(aes(tooltip = paste("Value:", input$var))) + # Add a personalized tooltip
+      labs(title = "Interactive chart with ggiraph")
+    girafe(ggobj = p)
   })
 
   # Interactive chart with plotly
   output$plot_plotly <- renderPlotly({
-    p2 <- ggplot(mtcars, aes_string(x = "wt", y= input$var, color = "factor(cyl)")) + 
+    p2 <- ggplot(
+      mtcars,
+      aes_string(x = "wt", y = input$var, color = "factor(cyl)")
+    ) +
       geom_point(size = 4) +
       labs(title = "Plotly chart")
     ggplotly(p2)

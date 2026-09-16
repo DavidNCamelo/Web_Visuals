@@ -1,10 +1,12 @@
 # Shiny app
 # required libraries
-library(shiny)
-library(dplyr)
-library(plotly)
-library(ggplot2)
-library(lubridate)
+box::use(
+  shiny[...],
+  dplyr[...],
+  plotly[...],
+  ggplot2[...],
+  lubridate[...]
+)
 
 # Data
 #source('./interactive_dashboard_with_R/rent_trip.R')
@@ -97,7 +99,8 @@ ui <- fluidPage(
 
   # Add first charts row
   fluidRow(
-    column(6,
+    column(
+      6,
       div(
         style = "height: 400px; overflow-y: auto; border: 1px solid #fff; padding: 5px",
         plotlyOutput(
@@ -107,7 +110,8 @@ ui <- fluidPage(
       )
     ),
 
-    column(6, 
+    column(
+      6,
       div(
         style = "height: 400px; overflow-y: auto; border: 1px solid #fff; padding: 5px",
         plotlyOutput(
@@ -120,28 +124,29 @@ ui <- fluidPage(
 
   # Add Second chart row
   fluidRow(
-    column(6,
+    column(
+      6,
       plotlyOutput(
         outputId = "start_trips_ph",
         width = "100%"
       )
     ),
 
-    column(6,
+    column(
+      6,
       plotlyOutput(
         outputId = "end_trips_ph",
         width = "100%"
       )
     )
- )
+  )
 )
 
 # Create the server
 server <- function(input, output, session) {
-
   # Create the reactive of input$years
   year_filter <- reactive({
-    if(input$year != "ALL") {
+    if (input$year != "ALL") {
       trips %>%
         filter(year(Start_Date) == as.numeric(input$year))
     } else {
@@ -164,14 +169,14 @@ server <- function(input, output, session) {
     if (input$year != "ALL") {
       filtered_dates <- trips %>%
         filter(year(Start_Date) == as.numeric(input$year))
-      
+
       new_min <- min(filtered_dates$Start_Date, na.rm = TRUE)
       new_max <- max(filtered_dates$Start_Date, na.rm = TRUE)
     } else {
       new_min <- min(trips$Start_Date, na.rm = TRUE)
       new_max <- max(trips$Start_Date, na.rm = TRUE)
     }
-  
+
     # Update date range slicer
     updateDateRangeInput(
       session,
@@ -185,22 +190,22 @@ server <- function(input, output, session) {
 
   # Reactive for previous filters and the new Start City
   start_city_filter <- reactive({
-    if("ALL" %in% input$start_city) {
+    if ("ALL" %in% input$start_city) {
       date_range_filter()
     } else {
       date_range_filter() %>%
         filter(Start_Station_City %in% input$start_city)
-    }    
+    }
   })
 
   # Reactive for previous filters and the new Start Station
   start_station_filter <- reactive({
-    if("ALL" %in% input$start_station) {
+    if ("ALL" %in% input$start_station) {
       start_city_filter()
     } else {
       start_city_filter() %>%
         filter(Start_Station_Name %in% input$start_station)
-    }    
+    }
   })
 
   # Oberve events for the last 2 filters
@@ -211,10 +216,10 @@ server <- function(input, output, session) {
     } else {
       date_range_filter() %>% filter(Start_Station_City %in% input$start_city)
     }
-  
+
     # Extract values
     updated_stations <- sort(unique(filtered_data$Start_Station_Name))
-  
+
     # #Ubdate the start station slicer
     updateSelectInput(
       inputId = "start_station",
@@ -222,10 +227,10 @@ server <- function(input, output, session) {
       selected = "ALL"
     )
   })
-  
+
   # Reactive for previous filters and the new End City
   end_city_filter <- reactive({
-    if("ALL" %in% input$end_city) {
+    if ("ALL" %in% input$end_city) {
       start_station_filter()
     } else {
       start_station_filter() %>%
@@ -234,12 +239,12 @@ server <- function(input, output, session) {
   })
 
   end_station_filter <- reactive({
-    if("ALL" %in% input$end_station) {
+    if ("ALL" %in% input$end_station) {
       end_city_filter()
     } else {
       end_city_filter() %>%
         filter(End_Station_Name %in% input$end_station)
-    }    
+    }
   })
 
   # Oberve events for the last 2 filters
@@ -250,10 +255,10 @@ server <- function(input, output, session) {
     } else {
       start_city_filter() %>% filter(End_Station_City %in% input$end_city)
     }
-  
+
     # Extract values
     end_updated_stations <- sort(unique(end_ct_filtered_data$End_Station_Name))
-  
+
     # #Ubdate the end station slicer
     updateSelectInput(
       inputId = "end_station",
@@ -265,7 +270,7 @@ server <- function(input, output, session) {
   # Graphic charts
 
   # Start Trips per station chart
-  output$start_trips_st <- renderPlotly ({
+  output$start_trips_st <- renderPlotly({
     # First counting the started trips by station
     started_trips_st <- start_station_filter() %>%
       count(Start_Station_Name, name = "started_trips")
@@ -273,13 +278,21 @@ server <- function(input, output, session) {
     # Add abreviations into the tootlip
     started_trips_st$label_text <- ifelse(
       started_trips_st$started_trips >= 1000,
-      paste0(formatC(started_trips_st$started_trips / 1000, format = "f", digits = 1), "K"),
+      paste0(
+        formatC(
+          started_trips_st$started_trips / 1000,
+          format = "f",
+          digits = 1
+        ),
+        "K"
+      ),
       as.character(started_trips_st$started_trips)
     )
 
     # Double row tooltip
     started_trips_st$tooltip_text <- paste0(
-      started_trips_st$Start_Station_Name, "<br>",
+      started_trips_st$Start_Station_Name,
+      "<br>",
       format(started_trips_st$started_trips, big.mark = ",")
     )
 
@@ -287,7 +300,7 @@ server <- function(input, output, session) {
     plot_ly(
       data = started_trips_st,
       x = ~started_trips,
-      y = ~reorder(Start_Station_Name, started_trips),
+      y = ~ reorder(Start_Station_Name, started_trips),
       text = ~label_text,
       textposition = "outside",
       type = "bar",
@@ -303,7 +316,7 @@ server <- function(input, output, session) {
   })
 
   # Ended Trips per station chart
-  output$end_trips_st <- renderPlotly ({
+  output$end_trips_st <- renderPlotly({
     # First counting the started trips by station
     ended_trips_st <- end_station_filter() %>%
       count(End_Station_Name, name = "ended_trips")
@@ -311,20 +324,24 @@ server <- function(input, output, session) {
     # Add abreviations into the tootlip
     ended_trips_st$label_text <- ifelse(
       ended_trips_st$ended_trips >= 1000,
-      paste0(formatC(ended_trips_st$ended_trips / 1000, format = "f", digits = 1), "K"),
+      paste0(
+        formatC(ended_trips_st$ended_trips / 1000, format = "f", digits = 1),
+        "K"
+      ),
       as.character(ended_trips_st$ended_trips)
     )
 
     # Double row tooltip
     ended_trips_st$tooltip_text <- paste0(
-      ended_trips_st$End_Station_Name, "<br>",
+      ended_trips_st$End_Station_Name,
+      "<br>",
       format(ended_trips_st$ended_trips, big.mark = ",")
     )
     # Create the chart
     plot_ly(
       data = ended_trips_st,
       x = ~ended_trips,
-      y = ~reorder(End_Station_Name, ended_trips),
+      y = ~ reorder(End_Station_Name, ended_trips),
       text = ~label_text,
       type = "bar",
       textposition = "outside",
@@ -341,7 +358,7 @@ server <- function(input, output, session) {
   })
 
   # Started trip per hour
-  output$start_trips_ph <- renderPlotly ({
+  output$start_trips_ph <- renderPlotly({
     # Count the started trips per hour
     start_trips_ph <- end_station_filter() %>%
       mutate(hour = as.integer(substr(Start_Time, 1, 2))) %>%
@@ -350,15 +367,20 @@ server <- function(input, output, session) {
     # Create chart
     started_per_hour <- ggplot(
       start_trips_ph,
-      aes(x = hour, y = started_trips_per_hour)) +  
-      geom_col(fill = "blue")+
-      labs(x = "Start Hour", y = "Started Trips", title =  "Started Trips per Hour")
+      aes(x = hour, y = started_trips_per_hour)
+    ) +
+      geom_col(fill = "blue") +
+      labs(
+        x = "Start Hour",
+        y = "Started Trips",
+        title = "Started Trips per Hour"
+      )
 
     ggplotly(started_per_hour) # Add plotlyframe to show tooltip
   })
 
   # Ended trip per hour
-  output$end_trips_ph <- renderPlotly ({
+  output$end_trips_ph <- renderPlotly({
     # Count the started trips per hour
     end_trips_ph <- end_station_filter() %>%
       mutate(hour = as.integer(substr(End_Time, 1, 2))) %>%
@@ -367,13 +389,13 @@ server <- function(input, output, session) {
     # Create chart
     ended_per_hour <- ggplot(
       end_trips_ph,
-      aes(x = hour, y = ended_trips_per_hour)) +  
-      geom_col(fill = "orange")+
-      labs(x = "End Hour", y = "Ended Trips", title =  "Started Trips per Hour")
+      aes(x = hour, y = ended_trips_per_hour)
+    ) +
+      geom_col(fill = "orange") +
+      labs(x = "End Hour", y = "Ended Trips", title = "Started Trips per Hour")
 
     ggplotly(ended_per_hour) # Add plotlyframe to show tooltip
   })
 }
 
 shinyApp(ui, server)
-

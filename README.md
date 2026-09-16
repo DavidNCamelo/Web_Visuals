@@ -58,8 +58,8 @@ If is the first time in this repository
 rv sync
 ```
 
-And then 
+And then (optional add a specific port)
 
 ```bash
-Rscript script.R
+Rscript -e "shiny::runApp('script.R', port = 4949)"
 ```

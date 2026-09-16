@@ -1,12 +1,13 @@
-## Monitor 
+## Monitor
 # Librerías requeridas
-library(shiny)
-library(bslib)
-library(plotly)
+box::use(
+  shiny[...],
+  bslib[...],
+  plotly[...]
+)
 
 # Crear UI
-ui <- page_fluid(  
-  
+ui <- page_fluid(
   # Título del monitor
   tags$div(
     tags$h1(HTML("Monitor")),
@@ -30,20 +31,44 @@ ui <- page_fluid(
     selectInput(
       "subcategoria",
       "Subcategoría",
-      choices = c("subcat1", "subcat2", "subcat3", "subcat4", "subcat5", "subcat6", "subcat7", "subcat8", "subcat9")
+      choices = c(
+        "subcat1",
+        "subcat2",
+        "subcat3",
+        "subcat4",
+        "subcat5",
+        "subcat6",
+        "subcat7",
+        "subcat8",
+        "subcat9"
+      )
     ),
 
     selectInput(
       "producto",
       "Producto",
-      choices = c("prod1", "prod2", "prod3", "prod4", "prod5", "prod6", "prod7", "prod8", "prod9", "prod10", "prod11",
-                 "prod12", "prod13", "prod14", "prod15")
+      choices = c(
+        "prod1",
+        "prod2",
+        "prod3",
+        "prod4",
+        "prod5",
+        "prod6",
+        "prod7",
+        "prod8",
+        "prod9",
+        "prod10",
+        "prod11",
+        "prod12",
+        "prod13",
+        "prod14",
+        "prod15"
+      )
     ),
-    
+
     col_widths = c(3, 3, 3, 3)
   ),
 
-    
   # Fila indicadores
   layout_columns(
     value_box(
@@ -87,7 +112,6 @@ ui <- page_fluid(
 
   # Primera Fila de Gráficos
   layout_columns(
-    
     card(
       full_screen = TRUE,
       card_header("Desviación Mes"),
@@ -115,7 +139,7 @@ ui <- page_fluid(
       full_screen = TRUE,
       card_header("Resumen de Datos"),
       div(
-        style = "min-height: 25vh; overflow-y: auto;",  # Cambia esto según lo que necesites
+        style = "min-height: 25vh; overflow-y: auto;", # Cambia esto según lo que necesites
         tableOutput("tabla")
       )
     ),

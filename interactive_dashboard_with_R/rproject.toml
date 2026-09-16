@@ -22,4 +22,8 @@ dependencies = [
     "plotly",
     "box",
     "dplyr",
+    "ggplot2",
+    "lubridate",
+    "ggiraph",
+    "DT",
 ]
