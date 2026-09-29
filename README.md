@@ -34,6 +34,12 @@ And then
 uv run script.py
 ```
 
+Incase when the framework is shiny, run with:
+
+```bash
+uv run shiny run --reload script.py
+```
+
 # Now with R
 
 And the course to learn this kind of visualization for R is:
