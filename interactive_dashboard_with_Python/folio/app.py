@@ -9,6 +9,7 @@ from src.page1.server import page1_server
 from src.page1.ui import page1_ui
 from src.page2.server import page2_server
 from src.page2.ui import page2_ui
+from src.theme import app_theme
 
 app_ui = ui.page_navbar(
     ui.nav_panel("Global", page1_ui("p1")),
@@ -16,6 +17,7 @@ app_ui = ui.page_navbar(
     title="Portafolio",
     id="nav",
     fillable=False,
+    theme=app_theme,
 )
 
 

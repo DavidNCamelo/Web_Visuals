@@ -9,6 +9,7 @@ from shinywidgets import render_plotly
 from ..config import ASSETS, COLOR_DOWN, COLOR_UP, PERIODS
 from ..data import get_history
 from ..metrics import fmt_pct, fmt_price, variation
+from ..theme import variation_cell_styles, variation_theme
 
 
 def build_summary(history: dict[str, pd.Series]) -> pd.DataFrame:
@@ -71,11 +72,13 @@ def page1_server(input, output, session):
         for _, r in df.iterrows():
             d = r["d"]
             arrow = "" if d is None or pd.isna(d) else ("▲ " if d >= 0 else "▼ ")
+            is_up = None if d is None or pd.isna(d) else d >= 0
             boxes.append(
                 ui.value_box(
                     r["ticker"],
                     fmt_price(r["price"]),
                     ui.tags.small(f"{arrow}{fmt_pct(d, 2, signed=True)} hoy · {r['name']}"),
+                    theme=variation_theme(is_up),
                 )
             )
         return ui.layout_columns(*boxes, col_widths=[2, 2, 2, 3, 3] if len(boxes) == 5 else None)
@@ -101,6 +104,7 @@ def page1_server(input, output, session):
                     }
                 ),
                 width="100%",
+                styles=variation_cell_styles(df[key].tolist(), col_index=3),
             )
 
     for key, label, _ in PERIODS:

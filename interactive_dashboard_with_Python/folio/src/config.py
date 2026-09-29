@@ -29,7 +29,7 @@ PRICE_TTL_SECONDS = 6 * 3600
 INFO_TTL_SECONDS = 24 * 3600
 
 # Colores (paleta de referencia validada: azul / naranja como par divergente)
-COLOR_UP = "#2a78d6"
+COLOR_UP = "#2ad633"
 COLOR_DOWN = "#eb6834"
-COLOR_LINE = "#2a78d6"
+COLOR_LINE = "#d69f2a"
 COLOR_MUTED = "#52514e"

@@ -44,9 +44,13 @@ def fmt_x(x, digits: int = 1) -> str:
 
 
 def fmt_price(x, currency: str | None = None) -> str:
+    """Formatea un precio. Sin decimales para valores grandes (p. ej. COP)
+    para que quepa en una sola línea dentro de la tarjeta."""
     if not _ok(x):
         return "—"
-    return f"{x:,.2f} {currency}" if currency else f"{x:,.2f}"
+    digits = 0 if abs(x) >= 1000 else 2
+    txt = f"{x:,.{digits}f}"
+    return f"{txt} {currency}" if currency else txt
 
 
 def fmt_big(x) -> str:
@@ -68,7 +72,12 @@ def dividend_yield(info: dict) -> float | None:
     if _ok(y):
         return y
     y = info.get("dividendYield")  # yfinance >= 0.2.54: viene en porcentaje
-    return y / 100 if _ok(y) else None
+    if _ok(y):
+        return y / 100
+    # Algunos ETFs no listados en EE. UU. (p. ej. BVC) solo traen este campo,
+    # ya como fracción (0.0 si el fondo no reparte dividendos).
+    y = info.get("trailingAnnualDividendYield")
+    return y if _ok(y) else None
 
 
 def expense_ratio(info: dict) -> float | None:
