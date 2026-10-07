@@ -82,6 +82,14 @@ def page2_server(input, output, session):
             return s
         return s.loc[s.index >= s.index[-1] - pd.DateOffset(years=HISTORY_YEARS)]
 
+    @reactive.calc
+    def selected_history() -> pd.Series:
+        s = five_years()
+        start, end = input.date_range()
+        if s.empty or start is None or end is None:
+            return s
+        return s.loc[(s.index >= pd.Timestamp(start)) & (s.index <= pd.Timestamp(end))]
+
     @render.ui
     def subtitle():
         i, tk = info(), input.ticker()
@@ -111,7 +119,7 @@ def page2_server(input, output, session):
 
     @render_plotly
     def price_chart():
-        s = five_years()
+        s = selected_history()
         if s.empty:
             return go.Figure()
         return price_figure(s, input.ticker())
