@@ -1,15 +1,11 @@
 """Configuración central: activos, periodos y colores."""
 
+import json
+import os
+
 # ticker -> (nombre a mostrar, tipo). Tipo: "stock" | "etf"
-ASSETS: dict[str, dict] = {
-    "ICOLCAP.CL": {"name": "icolcap", "type": "etf"},
-    "CIB": {"name": "Cibest", "type": "stock"},
-    "NU": {"name": "Nu Holdings", "type": "stock"},
-    "IUIT.L": {"name": "iShares S&P 500 Tech", "type": "etf"},
-    "GOAU": {"name": "US Global GO GOLD", "type": "etf"},
-    "NVDA": {"name": "Nvidia", "type": "stock"},
-    "INTC": {"name": "IBM", "type": "stock"},
-}
+portfolio = os.environ.get("PORTFOLIO_ASSETS")
+ASSETS: dict[str, dict] = json.loads(portfolio)
 
 # Selector: {ticker: "Nombre (TICKER)"}
 CHOICES = {t: f"{a['name']} ({t})" for t, a in ASSETS.items()}
