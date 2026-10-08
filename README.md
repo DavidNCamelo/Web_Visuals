@@ -8,11 +8,11 @@ In general this course is a good introduction to implement these tools, step by 
 
 The next images are just for the Python folder
 
-![First Steps](image-1.png)
+![First Steps](images/image-1.png)
 
-![Scatter](image-2.png)
+![Scatter](images/image-2.png)
 
-![Final Dash Course](image.png)
+![Final Dash Course](images/image.png)
 
 ## Implementation
 
@@ -45,7 +45,7 @@ uv run shiny run --reload script.py
 And the course to learn this kind of visualization for R is:
 https://www.udemy.com/course/el-arte-de-programar-en-r-anade-valor-a-tu-cv 
 
-![alt text](image-3.png)
+![alt text](images/image-3.png)
 
 Keep in mind, the main pillar of working with R is shiny, a great package/framework to create apps in R. These recently could be dockerising with different metodologies and be deployed as any other language.
 
