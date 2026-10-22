@@ -6,6 +6,21 @@ import math
 import pandas as pd
 
 
+def previous_price(close: pd.Series, offset: dict) -> float | None:
+    """Último cierre en o antes del periodo de referencia."""
+    close = close.dropna()
+    if len(close) < 2:
+        return None
+    if "days" in offset:
+        base = close.iloc[-1 - offset["days"]] if len(close) > offset["days"] else None
+    else:
+        target = close.index[-1] - pd.DateOffset(**offset)
+        if close.index[0] > target:
+            return None
+        base = close.loc[:target].iloc[-1]
+    return float(base) if base is not None else None
+
+
 def variation(close: pd.Series, offset: dict) -> float | None:
     """Variación porcentual del último cierre frente al cierre a `offset` atrás.
 
@@ -14,19 +29,10 @@ def variation(close: pd.Series, offset: dict) -> float | None:
     Devuelve una fracción (0.05 = +5 %) o None si no hay historia suficiente.
     """
     close = close.dropna()
-    if len(close) < 2:
-        return None
-    last = close.iloc[-1]
-    if "days" in offset:
-        base = close.iloc[-1 - offset["days"]] if len(close) > offset["days"] else None
-    else:
-        target = close.index[-1] - pd.DateOffset(**offset)
-        if close.index[0] > target:
-            return None  # la serie no llega tan atrás
-        base = close.loc[:target].iloc[-1]
+    base = previous_price(close, offset)
     if base is None or base == 0:
         return None
-    return float(last / base - 1)
+    return float(close.iloc[-1] / base - 1)
 
 
 def _ok(x) -> bool:

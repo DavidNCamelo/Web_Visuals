@@ -8,7 +8,7 @@ from shinywidgets import render_plotly
 
 from ..config import ASSETS, COLOR_DOWN, COLOR_UP, PERIODS
 from ..data import get_history
-from ..metrics import fmt_pct, fmt_price, variation
+from ..metrics import fmt_pct, fmt_price, previous_price, variation
 from ..theme import variation_cell_styles, variation_theme
 
 
@@ -20,6 +20,7 @@ def build_summary(history: dict[str, pd.Series]) -> pd.DataFrame:
         row["price"] = float(close.iloc[-1]) if len(close) else None
         row["asof"] = close.index[-1] if len(close) else None
         for key, _, offset in PERIODS:
+            row[f"{key}_previous_price"] = previous_price(close, offset)
             row[key] = variation(close, offset) if len(close) else None
         rows.append(row)
     return pd.DataFrame(rows)
@@ -92,19 +93,20 @@ def page1_server(input, output, session):
         @output(id=f"table_{key}")
         @render.data_frame
         def _table():
-            df = summary()[["ticker", "name", "price", key]].copy()
+            df = summary()[["ticker", "name", f"{key}_previous_price", "price", key]].copy()
             df = df.sort_values(key, ascending=False, na_position="last")
             return render.DataGrid(
                 pd.DataFrame(
                     {
                         "Ticker": df["ticker"],
                         "Activo": df["name"],
+                        "Precio anterior": [fmt_price(v) for v in df[f"{key}_previous_price"]],
                         "Precio": [fmt_price(v) for v in df["price"]],
                         label: [fmt_pct(v, 2, signed=True) for v in df[key]],
                     }
                 ),
                 width="100%",
-                styles=variation_cell_styles(df[key].tolist(), col_index=3),
+                styles=variation_cell_styles(df[key].tolist(), col_index=4),
             )
 
     for key, label, _ in PERIODS:
